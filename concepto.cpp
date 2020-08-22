@@ -41,6 +41,8 @@ void preOrden(Nodo *);
 
 void InOrden(Nodo *);
 
+void postOrden(Nodo *);
+
 int main(){
     
     menu();
@@ -58,7 +60,8 @@ void menu(){
         cout<<"3. Buscar un elemento en el arbol"<<endl;
         cout<<"4. Recorrer el arbol completo en pre orden"<<endl;
         cout<<"5. Recorrer el arbol completo de in orden"<<endl;
-        cout<<"6. Salir"<<endl;
+        cout<<"6. Recorrer el arbol completo en post orden"<<endl;
+        cout<<"7. Salir"<<endl;
         cout<<"Opcion: ";
         cin>>opcion;
 
@@ -96,6 +99,11 @@ void menu(){
                     cout<<"\n\n";
                     dato=getchar();
                     break;
+            case 6: cout<<"\nRecorrido en post orden: ";
+                    postOrden(arbol);
+                    cout<<"\n\n";
+                    dato=getchar();
+                    break;
         }
         cout<<"Presione enter para continuar";
         cout<<"\n";
@@ -103,7 +111,7 @@ void menu(){
         system("clear");
         
 
-    }while(opcion != 6);
+    }while(opcion != 7);
 }
 
 Nodo *crearNodo(int n){
@@ -182,6 +190,17 @@ void InOrden(Nodo *arbol){
     InOrden(arbol->izq);
     cout<<arbol->dato<<" - ";
     InOrden(arbol->der);
+    }
+}
+
+void postOrden(Nodo *arbol){
+    if(arbol == NULL){
+        return;
+    }
+    else{
+        postOrden(arbol->izq);
+        postOrden(arbol->der);
+        cout<<arbol->dato<<" - ";
     }
 }
 
