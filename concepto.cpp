@@ -12,8 +12,8 @@
  *   - Orden de un árbol*/
 
 #include<iostream>
-#include<stdlib.h>
-#include<stdio.h>
+#include<cstdlib>
+
 
 using namespace std;
 
@@ -23,13 +23,14 @@ struct Nodo{
     int dato;
     Nodo *der;
     Nodo *izq;
+    Nodo *padre;
 };
 
 void menu();
 
-Nodo *crearNodo(int);
+Nodo *crearNodo(int,Nodo *);
 
-void insertarNodo(Nodo *&,int);
+void insertarNodo(Nodo *&,int,Nodo *);
 
 Nodo *arbol = NULL;
 
@@ -42,6 +43,16 @@ void preOrden(Nodo *);
 void InOrden(Nodo *);
 
 void postOrden(Nodo *);
+
+void eliminar(Nodo *,int);
+
+void eliminarNodo(Nodo *);
+
+Nodo *minimo(Nodo *);
+
+void reemplazar(Nodo *,Nodo *);
+
+void destruirNodo(Nodo *);
 
 int main(){
     
@@ -61,14 +72,15 @@ void menu(){
         cout<<"4. Recorrer el arbol completo en pre orden"<<endl;
         cout<<"5. Recorrer el arbol completo de in orden"<<endl;
         cout<<"6. Recorrer el arbol completo en post orden"<<endl;
-        cout<<"7. Salir"<<endl;
+        cout<<"7. Eliminar nodo en el arbol"<<endl;
+        cout<<"8. Salir"<<endl;
         cout<<"Opcion: ";
         cin>>opcion;
 
         switch(opcion){
             case 1: cout<<"\nDigite un numero: ";
                     cin>>dato;
-                    insertarNodo(arbol,dato);
+                    insertarNodo(arbol,dato,NULL);
                     cout<<"\n";
                     dato=getchar();
                     break;
@@ -104,6 +116,12 @@ void menu(){
                     cout<<"\n\n";
                     dato=getchar();
                     break;
+            case 7: cout<<"\nDigite el nodo a eliminar: ";
+                    cin>>dato;
+                    eliminar(arbol,dato);
+                    cout<<"\n";
+                    break;
+
         }
         cout<<"Presione enter para continuar";
         cout<<"\n";
@@ -111,31 +129,32 @@ void menu(){
         system("clear");
         
 
-    }while(opcion != 7);
+    }while(opcion != 8);
 }
 
-Nodo *crearNodo(int n){
+Nodo *crearNodo(int n,Nodo *padre){
     Nodo *nuevo_nodo = new Nodo();
 
     nuevo_nodo->dato = n;
     nuevo_nodo->der = NULL;
     nuevo_nodo->izq = NULL;
+    nuevo_nodo->padre = padre;
 
     return nuevo_nodo;
 }
 
-void insertarNodo(Nodo *&arbol,int n){
+void insertarNodo(Nodo *&arbol,int n,Nodo *padre){
     if(arbol == NULL){
-        Nodo *nuevo_nodo = crearNodo(n);
+        Nodo *nuevo_nodo = crearNodo(n,padre);
         arbol = nuevo_nodo;
     }
     else{
         int valorRaiz = arbol->dato;
         if(n < valorRaiz){
-            insertarNodo(arbol->izq,n);
+            insertarNodo(arbol->izq,n,arbol);
         }
         else{
-        insertarNodo(arbol->der,n);
+        insertarNodo(arbol->der,n,arbol);
         }
     }
 }
@@ -203,6 +222,78 @@ void postOrden(Nodo *arbol){
         cout<<arbol->dato<<" - ";
     }
 }
+Nodo *minimo(Nodo *arbol){
+    if(arbol == NULL){
+        return NULL;
+                      
+    }
+    if(arbol->izq){
+        return minimo(arbol->izq);
+                      
+    }
+    else{
+        return arbol;
+                      
+    }
+     
+}
+
+void eliminar(Nodo *arbol,int n){
+    if(arbol == NULL){
+        return;
+    }
+    else if(n < arbol->dato){
+        eliminar(arbol->izq,n);
+
+    }
+    else if(n > arbol->dato){
+        eliminar(arbol->der,n);
+    }
+    else{
+        eliminarNodo(arbol);
+    }
+}
+
+void reemplazar(Nodo *arbol,Nodo *nuevoNodo){
+    if(arbol->padre){
+		if(arbol->dato == arbol->padre->izq->dato){
+            arbol->padre->izq = nuevoNodo;
+        }
+        else if(arbol->dato == arbol->padre->der->dato){
+            arbol->padre->der = nuevoNodo;
+        }
+    }
+    if(nuevoNodo){
+        nuevoNodo->padre = arbol->padre;
+    }
+}
+void destruirNodo(Nodo *nodo){
+    nodo->izq = NULL;
+    nodo->der = NULL;
+
+    delete nodo;
+}
+void eliminarNodo(Nodo *nodoEliminar){
+    if(nodoEliminar->izq && nodoEliminar->der){
+        Nodo *menor = minimo(nodoEliminar->der);
+        nodoEliminar->dato = menor->dato;
+        eliminarNodo(menor);
+
+    }
+    else if(nodoEliminar->izq){
+        reemplazar(nodoEliminar,nodoEliminar->izq);
+        destruirNodo(nodoEliminar);
+    }
+    else if(nodoEliminar->der){
+        reemplazar(nodoEliminar,nodoEliminar->der);
+        destruirNodo(nodoEliminar);
+    }
+    else{
+        reemplazar(nodoEliminar,NULL);
+        destruirNodo(nodoEliminar);
+    }
+
+}
 
 
-
+ 
